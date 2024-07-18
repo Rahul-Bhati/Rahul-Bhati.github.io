@@ -35,4 +35,4 @@ Disallow:
 User-agent: *
 Disallow: 
 Disallow: /cgi-bin/
-Sitemap: http://rahul-bhati.github.io/
+Sitemap: http://rahul-bhati.github.io/sitemap.xml

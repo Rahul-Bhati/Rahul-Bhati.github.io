@@ -1,12 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Suspense } from "react";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
-import { SmoothScroll } from "@/components/smooth-scroll";
-import { ScrollProgress } from "@/components/scroll-progress";
-import { DetailDrawer } from "@/components/detail-drawer";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -68,22 +62,6 @@ export const viewport: Viewport = {
   ],
 };
 
-const personSchema = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: NAME,
-  url: SITE_URL,
-  jobTitle: ROLE,
-  worksFor: { "@type": "Organization", name: "Bloomingminds" },
-  address: { "@type": "PostalAddress", addressCountry: "India" },
-  knowsAbout: ["React", "React Native", "Solana", "Anchor", "Rust", "Web3"],
-  sameAs: [
-    "https://github.com/rahulbhati",
-    "https://twitter.com/animaekun",
-    "https://youtube.com/@animaekun",
-  ],
-};
-
 // Runs before paint to set the theme class, avoiding a flash of the wrong theme.
 const themeScript = `
 (function () {
@@ -108,22 +86,9 @@ export default function RootLayout({
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
-        />
       </head>
       <body className="min-h-full bg-white text-neutral-900 antialiased transition-colors duration-300 dark:bg-[#111] dark:text-neutral-200">
-        <SmoothScroll />
-        <ScrollProgress />
-        <Navbar />
-        <div className="mx-auto max-w-3xl px-5 sm:px-6">
-          <main>{children}</main>
-          <Footer />
-        </div>
-        <Suspense fallback={null}>
-          <DetailDrawer />
-        </Suspense>
+        {children}
       </body>
     </html>
   );

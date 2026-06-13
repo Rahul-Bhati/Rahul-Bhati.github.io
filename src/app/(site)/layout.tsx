@@ -4,6 +4,7 @@ import { Footer } from "@/components/footer";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { ScrollProgress } from "@/components/scroll-progress";
 import { DetailDrawer } from "@/components/detail-drawer";
+import { AnalyticsBeacon } from "@/components/analytics-beacon";
 
 const SITE_URL = "https://rahulbhati.dev";
 const NAME = "Rahul Bhati";
@@ -33,6 +34,7 @@ export default function SiteLayout({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
       />
+      <AnalyticsBeacon />
       <SmoothScroll />
       <ScrollProgress />
       <Navbar />

@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 
 export const SESSION_COOKIE = "pf_session";
-const MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
+const MAX_AGE_SECONDS = 60 * 60 * 24; // 1 day
 
 export type SessionPayload = {
   sub: string; // "admin"
@@ -25,7 +25,7 @@ export async function encryptSession(payload: SessionPayload): Promise<string> {
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("7d")
+    .setExpirationTime("1d")
     .sign(getKey());
 }
 

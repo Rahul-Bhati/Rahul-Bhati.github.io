@@ -13,6 +13,7 @@
     "db:studio": "dotenv -e .env.local -- prisma studio",
     "db:deploy": "dotenv -e .env.local -- prisma migrate deploy",
     "hash-password": "tsx scripts/hash-password.ts",
+    "setup-storage": "dotenv -e .env.local -- tsx scripts/setup-storage.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {

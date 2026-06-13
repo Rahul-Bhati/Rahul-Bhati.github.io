@@ -5,6 +5,7 @@ import { SmoothScroll } from "@/components/smooth-scroll";
 import { ScrollProgress } from "@/components/scroll-progress";
 import { DetailDrawer } from "@/components/detail-drawer";
 import { AnalyticsBeacon } from "@/components/analytics-beacon";
+import { getPublishedPostDetails } from "@/lib/posts";
 
 const SITE_URL = "https://rahulbhati.dev";
 const NAME = "Rahul Bhati";
@@ -25,9 +26,10 @@ const personSchema = {
   ],
 };
 
-export default function SiteLayout({
+export default async function SiteLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const postDetails = await getPublishedPostDetails();
   return (
     <>
       <script
@@ -43,7 +45,7 @@ export default function SiteLayout({
         <Footer />
       </div>
       <Suspense fallback={null}>
-        <DetailDrawer />
+        <DetailDrawer posts={postDetails} />
       </Suspense>
     </>
   );

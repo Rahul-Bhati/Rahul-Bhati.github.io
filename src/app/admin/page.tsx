@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { getDashboardStats } from "@/lib/analytics";
@@ -9,14 +10,13 @@ import {
   RankTable,
 } from "@/components/admin/dashboard-widgets";
 
-// Always render fresh analytics.
-export const dynamic = "force-dynamic";
-
 export default async function AdminDashboardPage() {
+  // getSession() reads cookies(), which already makes this route dynamic —
+  // no need for force-dynamic (which would disable the PageSpeed fetch cache).
   const session = await getSession();
   if (!session) redirect("/admin/login");
 
-  const [stats, psi] = await Promise.all([getDashboardStats(30), getPageSpeed()]);
+  const stats = await getDashboardStats(30);
 
   return (
     <div className="space-y-6">
@@ -50,32 +50,56 @@ export default async function AdminDashboardPage() {
         />
       </div>
 
-      <section className="rounded-2xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900/40">
-        <div className="mb-4 flex items-baseline justify-between">
-          <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-            SEO &amp; performance
-          </h2>
-          {psi.ok && (
-            <span className="truncate text-xs text-neutral-400 dark:text-neutral-500">
-              {psi.analyzedUrl} · mobile
-            </span>
-          )}
-        </div>
-        {psi.ok ? (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <ScoreGauge label="SEO" value={psi.scores.seo} />
-            <ScoreGauge label="Performance" value={psi.scores.performance} />
-            <ScoreGauge label="Accessibility" value={psi.scores.accessibility} />
-            <ScoreGauge label="Best practices" value={psi.scores.bestPractices} />
-          </div>
-        ) : (
-          <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            {psi.reason === "no-key"
-              ? "Add a PAGESPEED_API_KEY to .env.local to show live Lighthouse SEO/performance scores."
-              : `Couldn't fetch PageSpeed scores${psi.message ? ` (${psi.message})` : ""}. The site URL must be publicly reachable.`}
-          </p>
-        )}
-      </section>
+      {/* PageSpeed is slow on a cold fetch — stream it so the dashboard paints instantly. */}
+      <Suspense fallback={<SeoSkeleton />}>
+        <SeoScoreSection />
+      </Suspense>
     </div>
+  );
+}
+
+async function SeoScoreSection() {
+  const psi = await getPageSpeed();
+  return (
+    <section className="rounded-2xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900/40">
+      <div className="mb-4 flex items-baseline justify-between">
+        <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+          SEO &amp; performance
+        </h2>
+        {psi.ok && (
+          <span className="truncate text-xs text-neutral-400 dark:text-neutral-500">
+            {psi.analyzedUrl} · mobile
+          </span>
+        )}
+      </div>
+      {psi.ok ? (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <ScoreGauge label="SEO" value={psi.scores.seo} />
+          <ScoreGauge label="Performance" value={psi.scores.performance} />
+          <ScoreGauge label="Accessibility" value={psi.scores.accessibility} />
+          <ScoreGauge label="Best practices" value={psi.scores.bestPractices} />
+        </div>
+      ) : (
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          {psi.reason === "no-key"
+            ? "Add a PAGESPEED_API_KEY to .env.local to show live Lighthouse SEO/performance scores."
+            : `Couldn't fetch PageSpeed scores${psi.message ? ` (${psi.message})` : ""}. The site URL must be publicly reachable.`}
+        </p>
+      )}
+    </section>
+  );
+}
+
+function SeoSkeleton() {
+  return (
+    <section className="rounded-2xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900/40">
+      <h2 className="mb-4 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+        SEO &amp; performance
+      </h2>
+      <div className="flex items-center gap-2 text-sm text-neutral-400 dark:text-neutral-500">
+        <span className="size-3 animate-pulse rounded-full bg-neutral-300 dark:bg-neutral-700" />
+        Fetching live Lighthouse scores…
+      </div>
+    </section>
   );
 }

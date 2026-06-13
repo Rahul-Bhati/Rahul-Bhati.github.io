@@ -7,8 +7,8 @@ Gate-checked, milestone-driven. Drive with `m1`, `m2`, … On each milestone com
 | M1 | Foundation: Supabase + Prisma + env + docs | none (start) | ✅ done — migrated + seeded (3 projects, 7 posts, 12 links, 6 places), build green |
 | M2 | Auth + protected `/admin` | M1 build passes; DB migrated & seeded | ✅ done — login/guard/lockout/sign-out all verified, build green |
 | M3 | Dashboard + analytics | M2 login works; `/admin` guarded | ✅ done — pageview tracking + dashboard (stats/chart/top-pages) verified; DNT+bot excluded; PSI fallback clean |
-| M4 | Blog CMS (+ media upload) & public blog pages | M3 dashboard renders | ▶️ ready |
-| M5 | Project CMS + editable links/fields | M4 blog CRUD + `/blog/[slug]` live | ⬜ blocked on M4 |
+| M4 | Blog CMS (+ media upload) & public blog pages | M3 dashboard renders | ✅ done — CRUD + media upload + `/blog/[slug]` (generateMetadata + BlogPosting JSON-LD) + drawer all verified |
+| M5 | Project CMS + editable links/fields | M4 blog CRUD + `/blog/[slug]` live | ▶️ ready |
 | M6 | SEO/GEO hardening + ship to Vercel | M5 project CRUD + links live | ⬜ blocked on M5 |
 
 Legend: ⬜ not started · ⏳ in progress · ✅ done · ⚠️ done-with-override
@@ -26,8 +26,13 @@ _(none yet)_
 - **bcrypt hash in `.env.local` must escape `$` as `\$`** — Next loads env via dotenv-expand. `hash-password` script prints the escaped line.
 - Dev preview runs as `portfolio-auth` on port 3030 (port 3000 is the old portfolio).
 - Analytics capture in `src/app/api/track/route.ts` (Node runtime); beacon in `(site)` layout; aggregation in `src/lib/analytics.ts` (raw SQL for time-series/totals, Prisma groupBy for top lists). `userAgent()` from `next/server` gives device + isBot.
-- **PageSpeed scores need a public URL** — PSI can't reach `localhost`. Live SEO gauges appear only against the deployed/production URL (M6), and only when `PAGESPEED_API_KEY` is set. Until then the dashboard shows the fallback note.
+- **PageSpeed scores need a public URL** — PSI can't reach `localhost`, and returns **400** for `https://rahulbhati.dev` (not yet serving). Live gauges populate only once `NEXT_PUBLIC_SITE_URL` points at a deployed, reachable site (M6). Key is set in `.env.local`.
+- **Dashboard PSI is streamed via `<Suspense>`** (not awaited inline) — previously `force-dynamic` + inline `await getPageSpeed()` blocked the dashboard 15–27s every load. Removed `force-dynamic` (route is already dynamic via `cookies()` so the PSI fetch cache works) and moved PSI into a streamed `SeoScoreSection`. Stats now paint instantly.
 - `innerText` reflects CSS `text-transform` (uppercased labels) — use `textContent`/screenshots when asserting label text.
+- **M4 read migration:** public POSTS now come from DB (`src/lib/posts.ts`); `/blog`, home recent-thoughts, and the drawer read DB. PROJECTS still come from `content.ts` until M5. Drawer takes `posts` prop from the `(site)` layout (server) + `projects` from content.ts.
+- **Supabase Storage:** `media` bucket (public, 50MB cap — free-tier global limit; bucket >50MB → 413). Create via `npm run setup-storage`. Uploads via `uploadMedia` server action; URLs stored in coverImageUrl / inline markdown. Media rows NOT tracked in M4 (Media table reserved); deleting a post does not yet delete its storage objects.
+- **Markdown:** `src/components/markdown.tsx` (react-markdown + remark-gfm + rehype-sanitize, allows `<video>`); `.prose-portfolio` styles in globals.css.
+- Preview file-input testing: inject via `DataTransfer` (`input.files = dt.files; dispatch change`) — preview_fill can't set file inputs.
 
 ## Notes
 - Hosting: **Vercel** (GitHub Pages can't run server features). Repo name unchanged.

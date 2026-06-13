@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { posts } from "@/lib/content";
+import { getPublishedPosts } from "@/lib/posts";
 import { Reveal } from "./reveal";
 
-const recent = posts.slice(0, 3);
-
-export function RecentThoughts() {
+export async function RecentThoughts() {
+  const recent = (await getPublishedPosts()).slice(0, 3);
   return (
     <section id="writing" className="mt-16 scroll-mt-20">
       <Reveal>
@@ -25,7 +24,7 @@ export function RecentThoughts() {
 
       <ul className="mt-4">
         {recent.map((post, i) => (
-          <Reveal as="li" key={post.title} delay={0.08 + i * 0.06}>
+          <Reveal as="li" key={post.slug} delay={0.08 + i * 0.06}>
             <Link
               href={`/?post=${post.slug}`}
               scroll={false}
@@ -38,7 +37,7 @@ export function RecentThoughts() {
                 dateTime={post.datetime}
                 className="shrink-0 text-sm tabular-nums text-neutral-400 dark:text-neutral-500"
               >
-                {post.date}
+                {post.displayDate}
               </time>
             </Link>
           </Reveal>

@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+/* Class-based dark mode (toggled via `.dark` on <html>) instead of the default
+   prefers-color-scheme media query, so the manual theme switch can override. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html {
+  /* Prevent horizontal shift when the scrollbar toggles between routes. */
+  scrollbar-gutter: stable;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Inter contextual alternates + slashed zero for a more refined read. */
+  font-feature-settings: "cv11", "ss01";
+  font-optical-sizing: auto;
+}
+
+/* Monochrome text selection that matches the palette. */
+::selection {
+  background: #171717;
+  color: #ffffff;
+}
+html.dark ::selection {
+  background: #ededed;
+  color: #111111;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

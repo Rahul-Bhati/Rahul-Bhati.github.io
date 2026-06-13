@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { projects, type ProjectStatus } from "@/lib/content";
+import type { ProjectStatus } from "@/lib/content";
+import { getAllProjects } from "@/lib/projects";
 import { Reveal } from "@/components/reveal";
 
 export const metadata: Metadata = {
@@ -19,7 +20,8 @@ const badgeStyles: Record<ProjectStatus, string> = {
     "border border-neutral-200 text-neutral-500 dark:border-neutral-700 dark:text-neutral-400",
 };
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const projects = await getAllProjects();
   return (
     <section className="pt-12 sm:pt-16">
       <Reveal>
@@ -35,7 +37,7 @@ export default function ProjectsPage() {
 
       <ul className="mt-8 border-t border-neutral-200 dark:border-neutral-800">
         {projects.map((project, i) => (
-          <Reveal as="li" key={project.title} delay={0.1 + i * 0.05}>
+          <Reveal as="li" key={project.slug} delay={0.1 + i * 0.05}>
             <Link
               href={`/projects?project=${project.slug}`}
               scroll={false}

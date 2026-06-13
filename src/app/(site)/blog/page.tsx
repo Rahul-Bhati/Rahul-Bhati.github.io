@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublishedPosts } from "@/lib/posts";
+import { blogListJsonLd } from "@/lib/seo";
 import { Reveal } from "@/components/reveal";
 
 export const metadata: Metadata = {
@@ -15,6 +16,10 @@ export default async function BlogPage() {
 
   return (
     <section className="pt-12 sm:pt-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogListJsonLd(posts)) }}
+      />
       <Reveal>
         <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 sm:text-3xl dark:text-neutral-100">
           Blog

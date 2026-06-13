@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { projects } from "@/lib/content";
+import { getAllProjects } from "@/lib/projects";
 import { Reveal } from "./reveal";
 import { ProjectCard } from "./project-card";
 
-export function SelectedWork() {
+export async function SelectedWork() {
+  const projects = await getAllProjects();
   return (
     <section id="work" className="mt-16 scroll-mt-20">
       <Reveal>

@@ -6,8 +6,10 @@ import { ScrollProgress } from "@/components/scroll-progress";
 import { DetailDrawer } from "@/components/detail-drawer";
 import { AnalyticsBeacon } from "@/components/analytics-beacon";
 import { getPublishedPostDetails } from "@/lib/posts";
+import { getAllProjects } from "@/lib/projects";
+import { getSocials } from "@/lib/links";
+import { SITE_URL } from "@/lib/seo";
 
-const SITE_URL = "https://rahulbhati.dev";
 const NAME = "Rahul Bhati";
 
 const personSchema = {
@@ -29,7 +31,11 @@ const personSchema = {
 export default async function SiteLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const postDetails = await getPublishedPostDetails();
+  const [postDetails, projects, socials] = await Promise.all([
+    getPublishedPostDetails(),
+    getAllProjects(),
+    getSocials(),
+  ]);
   return (
     <>
       <script
@@ -39,13 +45,13 @@ export default async function SiteLayout({
       <AnalyticsBeacon />
       <SmoothScroll />
       <ScrollProgress />
-      <Navbar />
+      <Navbar socials={socials.map((s) => ({ platform: s.platform, label: s.label, href: s.href }))} />
       <div className="mx-auto max-w-3xl px-5 sm:px-6">
         <main>{children}</main>
         <Footer />
       </div>
       <Suspense fallback={null}>
-        <DetailDrawer posts={postDetails} />
+        <DetailDrawer posts={postDetails} projects={projects} />
       </Suspense>
     </>
   );

@@ -1,5 +1,9 @@
-import { pills, type Pill, type PillTone } from "@/lib/content";
+import type { PillTone } from "@/lib/content";
+import { getPills } from "@/lib/links";
+import { iconFor } from "@/lib/icon-registry";
 import { Reveal } from "./reveal";
+
+type PillData = { label: string; href: string | null; tone: string | null; platform: string };
 
 const toneStyles: Record<PillTone, { chip: string; icon: string }> = {
   neutral: {
@@ -28,9 +32,9 @@ const toneStyles: Record<PillTone, { chip: string; icon: string }> = {
   },
 };
 
-function PillBadge({ pill }: { pill: Pill }) {
-  const Icon = pill.icon;
-  const tone = toneStyles[pill.tone];
+function PillBadge({ pill }: { pill: PillData }) {
+  const Icon = iconFor(pill.platform);
+  const tone = toneStyles[(pill.tone as PillTone) in toneStyles ? (pill.tone as PillTone) : "neutral"];
   const base = `inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium ${tone.chip}`;
   const content = (
     <>
@@ -54,7 +58,8 @@ function PillBadge({ pill }: { pill: Pill }) {
   return <span className={base}>{content}</span>;
 }
 
-export function Hero() {
+export async function Hero() {
+  const pills = await getPills();
   return (
     <section className="pt-12 sm:pt-16">
       <Reveal>
@@ -66,7 +71,7 @@ export function Hero() {
 
       <ul className="mt-6 flex flex-wrap gap-2">
         {pills.map((pill, i) => (
-          <Reveal as="li" key={pill.label} delay={0.06 + i * 0.04}>
+          <Reveal as="li" key={pill.id} delay={0.06 + i * 0.04}>
             <PillBadge pill={pill} />
           </Reveal>
         ))}

@@ -8,8 +8,8 @@ Gate-checked, milestone-driven. Drive with `m1`, `m2`, … On each milestone com
 | M2 | Auth + protected `/admin` | M1 build passes; DB migrated & seeded | ✅ done — login/guard/lockout/sign-out all verified, build green |
 | M3 | Dashboard + analytics | M2 login works; `/admin` guarded | ✅ done — pageview tracking + dashboard (stats/chart/top-pages) verified; DNT+bot excluded; PSI fallback clean |
 | M4 | Blog CMS (+ media upload) & public blog pages | M3 dashboard renders | ✅ done — CRUD + media upload + `/blog/[slug]` (generateMetadata + BlogPosting JSON-LD) + drawer all verified |
-| M5 | Project CMS + editable links/fields | M4 blog CRUD + `/blog/[slug]` live | ▶️ ready |
-| M6 | SEO/GEO hardening + ship to Vercel | M5 project CRUD + links live | ⬜ blocked on M5 |
+| M5 | Project CMS + editable links/fields | M4 blog CRUD + `/blog/[slug]` live | ✅ done — project CRUD + `/projects/[slug]` (CreativeWork JSON-LD), `/admin/links` edits reflect live, all project/pill/social reads now DB-driven |
+| M6 | SEO/GEO hardening + ship to Vercel | M5 project CRUD + links live | ✅ done — env-driven SITE_URL, dynamic sitemap (14 urls), robots, /llms.txt, generated OG images, breadcrumb/Blog JSON-LD all verified; DEPLOY.md written |
 
 Legend: ⬜ not started · ⏳ in progress · ✅ done · ⚠️ done-with-override
 
@@ -33,6 +33,12 @@ _(none yet)_
 - **Supabase Storage:** `media` bucket (public, 50MB cap — free-tier global limit; bucket >50MB → 413). Create via `npm run setup-storage`. Uploads via `uploadMedia` server action; URLs stored in coverImageUrl / inline markdown. Media rows NOT tracked in M4 (Media table reserved); deleting a post does not yet delete its storage objects.
 - **Markdown:** `src/components/markdown.tsx` (react-markdown + remark-gfm + rehype-sanitize, allows `<video>`); `.prose-portfolio` styles in globals.css.
 - Preview file-input testing: inject via `DataTransfer` (`input.files = dt.files; dispatch change`) — preview_fill can't set file inputs.
+- **M5: full read-layer is now DB-driven.** `src/lib/projects.ts` (DTO matches static `Project` shape; enum ACTIVE/IN_PROGRESS/SHIPPED ↔ display), `src/lib/links.ts` (pills/socials/footer). Migrated: hero (pills + iconFor + tone), navbar (socials prop from `(site)` layout), footer (github href), selected-work, `/projects` listing, drawer (projects prop). `content.ts` now only supplies TYPES + `places`; its data arrays are unused.
+- **`/admin/links`** edits call `revalidatePath("/", "layout")` → reflect live across navbar/footer/hero. Verified: edited GitHub href appeared on home immediately.
+- **Preview client-navigation is flaky** (first `location.href` to a deep path often lands on `/`, and evals error "navigated") — verify pages with server-side `fetch()` of the URL + inspect HTML instead of relying on client nav.
+- **M6: SITE_URL resolver** in `src/lib/seo.ts` — `NEXT_PUBLIC_SITE_URL` → `VERCEL_PROJECT_PRODUCTION_URL` → localhost. Centralized (layout, (site) layout, sitemap, robots all import it). On Vercel **leave `NEXT_PUBLIC_SITE_URL` unset until a custom domain is connected** (auto-uses *.vercel.app).
+- **OG images** = generated cards via `opengraph-image.tsx` file convention (blog/[slug], projects/[slug], (site) default) using `renderOgImage` in `src/lib/og.tsx`. The metadata builders no longer set `openGraph.images` (avoids duplicate tags). og:image URL shows `localhost` in dev (Next uses request origin); canonical/og:url use the resolver correctly.
+- `/llms.txt` route (`app/llms.txt/route.ts`) for GEO; dynamic sitemap + robots disallow /admin,/api. Deploy steps in `docs/DEPLOY.md`. **Nothing is deployed yet** — user will push + import to Vercel themselves.
 
 ## Notes
 - Hosting: **Vercel** (GitHub Pages can't run server features). Repo name unchanged.

@@ -4,8 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { X, ExternalLink, ArrowUpRight, Calendar, Clock } from "lucide-react";
-import { projects, type ProjectStatus } from "@/lib/content";
+import type { ProjectStatus } from "@/lib/content";
 import type { PostDetail } from "@/lib/posts";
+import type { ProjectDTO } from "@/lib/projects";
 import { GithubIcon } from "./icons";
 import { iconFor } from "@/lib/icon-registry";
 import { Markdown } from "./markdown";
@@ -19,10 +20,16 @@ const statusBadge: Record<ProjectStatus, string> = {
 };
 
 type Active =
-  | { type: "project"; data: (typeof projects)[number] }
+  | { type: "project"; data: ProjectDTO }
   | { type: "post"; data: PostDetail };
 
-export function DetailDrawer({ posts }: { posts: PostDetail[] }) {
+export function DetailDrawer({
+  posts,
+  projects,
+}: {
+  posts: PostDetail[];
+  projects: ProjectDTO[];
+}) {
   const params = useSearchParams();
   const router = useRouter();
 
@@ -113,7 +120,7 @@ export function DetailDrawer({ posts }: { posts: PostDetail[] }) {
   );
 }
 
-function ProjectBody({ project }: { project: (typeof projects)[number] }) {
+function ProjectBody({ project }: { project: ProjectDTO }) {
   return (
     <div className="space-y-7">
       <div className="flex items-start gap-3">

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { SITE_URL } from "@/lib/seo";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -8,7 +9,6 @@ const inter = Inter({
   display: "swap",
 });
 
-const SITE_URL = "https://rahulbhati.dev";
 const NAME = "Rahul Bhati";
 const ROLE = "Full-Stack & React Native Developer";
 const DESCRIPTION =

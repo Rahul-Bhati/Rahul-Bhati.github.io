@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Calendar, Clock } from "lucide-react";
 import { getPublishedPostBySlug, getPublishedSlugs } from "@/lib/posts";
-import { buildPostMetadata, postJsonLd } from "@/lib/seo";
+import { buildPostMetadata, postJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { iconFor } from "@/lib/icon-registry";
 import { Markdown } from "@/components/markdown";
 
@@ -37,6 +37,18 @@ export default async function BlogPostPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(postJsonLd(raw)) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            breadcrumbJsonLd([
+              { name: "Home", path: "/" },
+              { name: "Blog", path: "/blog" },
+              { name: detail.title, path: `/blog/${detail.slug}` },
+            ]),
+          ),
+        }}
       />
 
       <Link

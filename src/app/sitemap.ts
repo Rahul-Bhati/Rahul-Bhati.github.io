@@ -1,13 +1,36 @@
 import type { MetadataRoute } from "next";
+import { db } from "@/lib/db";
+import { SITE_URL } from "@/lib/seo";
 
-const SITE_URL = "https://rahulbhati.dev";
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [posts, projects] = await Promise.all([
+    db.post.findMany({
+      where: { status: "PUBLISHED" },
+      select: { slug: true, updatedAt: true, publishedAt: true },
+    }),
+    db.project.findMany({ select: { slug: true, updatedAt: true } }),
+  ]);
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date("2026-06-12");
-  return [
-    { url: SITE_URL, lastModified, changeFrequency: "monthly", priority: 1 },
-    { url: `${SITE_URL}/blog`, lastModified, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${SITE_URL}/projects`, lastModified, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${SITE_URL}/map`, lastModified, changeFrequency: "yearly", priority: 0.5 },
+  const staticRoutes: MetadataRoute.Sitemap = [
+    { url: `${SITE_URL}`, changeFrequency: "monthly", priority: 1 },
+    { url: `${SITE_URL}/blog`, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${SITE_URL}/projects`, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${SITE_URL}/map`, changeFrequency: "yearly", priority: 0.5 },
   ];
+
+  const postRoutes: MetadataRoute.Sitemap = posts.map((p) => ({
+    url: `${SITE_URL}/blog/${p.slug}`,
+    lastModified: p.updatedAt ?? p.publishedAt ?? undefined,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  const projectRoutes: MetadataRoute.Sitemap = projects.map((p) => ({
+    url: `${SITE_URL}/projects/${p.slug}`,
+    lastModified: p.updatedAt,
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }));
+
+  return [...staticRoutes, ...postRoutes, ...projectRoutes];
 }

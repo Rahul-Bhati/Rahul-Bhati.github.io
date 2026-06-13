@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home } from "lucide-react";
-import { socialLinks } from "@/lib/content";
+import { iconFor } from "@/lib/icon-registry";
 
 const navLinks = [
   { label: "Blog", href: "/blog" },
@@ -11,7 +11,9 @@ const navLinks = [
   { label: "Travel Map", href: "/map" },
 ];
 
-export function Navbar() {
+export type NavSocial = { platform: string; label: string; href: string | null };
+
+export function Navbar({ socials }: { socials: NavSocial[] }) {
   const pathname = usePathname();
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -52,11 +54,12 @@ export function Navbar() {
         </div>
 
         <div className="-mr-1.5 hidden items-center gap-0.5 sm:flex">
-          {socialLinks.map((social) => {
-            const Icon = social.icon;
+          {socials.map((social) => {
+            if (!social.href) return null;
+            const Icon = iconFor(social.platform);
             return (
               <a
-                key={social.label}
+                key={social.platform}
                 href={social.href}
                 target="_blank"
                 rel="noopener noreferrer"

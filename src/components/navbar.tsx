@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home } from "lucide-react";
 import { iconFor } from "@/lib/icon-registry";
+import { Logo } from "@/components/logo";
 
 const navLinks = [
   { label: "Blog", href: "/blog" },
@@ -26,13 +26,11 @@ export function Navbar({ socials }: { socials: NavSocial[] }) {
             href="/"
             aria-label="Home"
             aria-current={isActive("/") ? "page" : undefined}
-            className={`grid size-9 place-items-center rounded-lg transition-colors ${
-              isActive("/")
-                ? "bg-neutral-100 text-neutral-900 dark:bg-neutral-800/80 dark:text-neutral-100"
-                : "text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-900 dark:hover:text-neutral-200"
+            className={`grid size-9 place-items-center rounded-lg transition-all hover:scale-105 ${
+              isActive("/") ? "ring-2 ring-neutral-300 dark:ring-neutral-700" : ""
             }`}
           >
-            <Home size={17} strokeWidth={2} />
+            <Logo size={28} />
           </Link>
           {navLinks.map((link) => {
             const active = isActive(link.href);

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 100" width="380" height="100">
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#d946ef"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="26" fill="url(#brand)"/>
+  <text x="50" y="54" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="60" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">R</text>
+  <text x="124" y="54" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="40" font-weight="700" fill="#111111" dominant-baseline="central" letter-spacing="-1">Rahul Bhati</text>
+</svg>

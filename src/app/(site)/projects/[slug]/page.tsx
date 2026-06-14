@@ -13,7 +13,12 @@ const badgeStyles: Record<string, string> = {
 };
 
 export async function generateStaticParams() {
-  return (await getProjectSlugs()).map((slug) => ({ slug }));
+  // Resilient: a transient DB issue at build time shouldn't fail the whole deploy.
+  try {
+    return (await getProjectSlugs()).map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({

@@ -8,7 +8,13 @@ import { iconFor } from "@/lib/icon-registry";
 import { Markdown } from "@/components/markdown";
 
 export async function generateStaticParams() {
-  return (await getPublishedSlugs()).map((slug) => ({ slug }));
+  // Resilient: a transient DB issue at build time shouldn't fail the whole deploy.
+  // Pages still render on-demand and are revalidated on publish.
+  try {
+    return (await getPublishedSlugs()).map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({

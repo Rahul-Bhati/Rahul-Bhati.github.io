@@ -30,7 +30,7 @@ git push -u origin portfolio-2026-with-auth
 
 > **Do NOT set `NEXT_PUBLIC_SITE_URL` yet.** With it unset, the app auto-uses your `*.vercel.app` URL (via `VERCEL_PROJECT_PRODUCTION_URL`) for canonical URLs, sitemap, OG images, and llms.txt. Set it only once you connect a custom domain (step 4).
 
-4. **Deploy.** Vercel runs `next build` (which runs `prisma generate` via `postinstall`). Migrations are already applied to Supabase, so no migrate step is needed on deploy. (If you later change the schema, run `npm run db:deploy` against production.)
+4. **Deploy.** Vercel runs the `vercel-build` script: **`prisma migrate deploy && next build`** — so pending migrations are applied to the database automatically on every deploy (idempotent; it never wipes data). This is what prevents the "table does not exist" build failure.
 
 ## 3. Verify the live site
 

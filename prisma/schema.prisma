@@ -1,0 +1,158 @@
+// Prisma schema — portfolio CMS.
+// Datasource: Supabase Postgres. Use pooled DATABASE_URL at runtime,
+// DIRECT_URL for migrations (Supabase pgbouncer requirement).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum ProjectStatus {
+  ACTIVE
+  IN_PROGRESS
+  SHIPPED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+enum LinkGroup {
+  SOCIAL
+  PILL
+  FOOTER
+}
+
+model Post {
+  id              String     @id @default(cuid())
+  slug            String     @unique
+  title           String
+  excerpt         String
+  contentMarkdown String     @default("")
+  coverImageUrl   String?
+  readingTime     String?
+  status          PostStatus @default(DRAFT)
+  publishedAt     DateTime?
+
+  // SEO (auto-derived when blank, override-able in the editor)
+  metaTitle       String?
+  metaDescription String?
+  keywords        String[]   @default([])
+  ogImageUrl      String?
+
+  media           Media[]
+  crossPosts      CrossPost[]
+
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([status, publishedAt])
+}
+
+model Project {
+  id              String        @id @default(cuid())
+  slug            String        @unique
+  title           String
+  description     String
+  status          ProjectStatus @default(ACTIVE)
+  gradient        String
+  year            String
+  overview        String
+  problem         String
+  techStack       String[]      @default([])
+  demoUrl         String?
+  githubUrl       String?
+  coverImageUrl   String?
+
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+  keywords        String[]      @default([])
+  ogImageUrl      String?
+
+  media           Media[]
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([status])
+}
+
+model Media {
+  id        String    @id @default(cuid())
+  url       String
+  type      MediaType
+  alt       String?
+  width     Int?
+  height    Int?
+
+  post      Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String?
+  project   Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String?
+
+  createdAt DateTime  @default(now())
+
+  @@index([postId])
+  @@index([projectId])
+}
+
+model CrossPost {
+  id       String @id @default(cuid())
+  post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId   String
+  platform String // e.g. "medium" | "x" | "linkedin" | "youtube"
+  label    String
+  href     String
+  order    Int    @default(0)
+
+  @@index([postId])
+}
+
+model SiteLink {
+  id        String    @id @default(cuid())
+  group     LinkGroup
+  platform  String // maps to an icon in the icon-registry
+  label     String
+  href      String?
+  tone      String? // pill tone (neutral/emerald/blue/amber/violet/rose)
+  order     Int       @default(0)
+  visible   Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([group, order])
+}
+
+model PageView {
+  id          String   @id @default(cuid())
+  path        String
+  referrer    String?
+  country     String?
+  device      String? // desktop | mobile | tablet
+  sessionHash String? // daily-rotating hash, no raw IP/PII
+  isBot       Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([path])
+  @@index([sessionHash])
+}
+
+model Place {
+  id      String @id @default(cuid())
+  name    String
+  country String
+  order   Int    @default(0)
+}

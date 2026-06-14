@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+/* Class-based dark mode (toggled via `.dark` on <html>) instead of the default
+   prefers-color-scheme media query, so the manual theme switch can override. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html {
+  /* Prevent horizontal shift when the scrollbar toggles between routes. */
+  scrollbar-gutter: stable;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Inter contextual alternates + slashed zero for a more refined read. */
+  font-feature-settings: "cv11", "ss01";
+  font-optical-sizing: auto;
+}
+
+/* Monochrome text selection that matches the palette. */
+::selection {
+  background: #171717;
+  color: #ffffff;
+}
+html.dark ::selection {
+  background: #ededed;
+  color: #111111;
+}
+
+/* Markdown content (blog posts + drawer). Minimal, palette-matched. */
+.prose-portfolio {
+  line-height: 1.7;
+}
+.prose-portfolio > * + * {
+  margin-top: 1rem;
+}
+.prose-portfolio h2 {
+  margin-top: 1.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.prose-portfolio h3 {
+  margin-top: 1.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.prose-portfolio a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-portfolio ul,
+.prose-portfolio ol {
+  padding-left: 1.25rem;
+}
+.prose-portfolio ul { list-style: disc; }
+.prose-portfolio ol { list-style: decimal; }
+.prose-portfolio li + li { margin-top: 0.25rem; }
+.prose-portfolio blockquote {
+  border-left: 3px solid currentColor;
+  padding-left: 1rem;
+  opacity: 0.8;
+  font-style: italic;
+}
+.prose-portfolio code {
+  font-size: 0.875em;
+  background: rgba(127, 127, 127, 0.15);
+  padding: 0.1em 0.35em;
+  border-radius: 0.3rem;
+}
+.prose-portfolio pre {
+  background: rgba(127, 127, 127, 0.12);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  overflow-x: auto;
+}
+.prose-portfolio pre code {
+  background: none;
+  padding: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

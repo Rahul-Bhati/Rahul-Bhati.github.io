@@ -45,6 +45,12 @@ git push -u origin portfolio-2026-with-auth
 2. Set `NEXT_PUBLIC_SITE_URL=https://yourdomain.com` in Environment Variables.
 3. Redeploy. All canonical URLs / sitemap / OG / llms.txt switch to the new domain automatically.
 
+## Troubleshooting
+
+**Whole site returns `404: NOT_FOUND` (plain text) even though the deploy is "Ready":**
+Vercel is serving the static `public/` folder instead of running the Next.js app — the **Framework Preset got set to "Other"** (common when the repo is named `*.github.io`). Symptom: `/logo.svg` returns 200 but `/` and `/_next/static/` return 404.
+Fix (now pinned in [vercel.json](../vercel.json) → `"framework": "nextjs"`): redeploy after pushing `vercel.json`. If it persists, in Vercel → **Settings → Build & Deployment**: set **Framework Preset = Next.js** and **clear any "Output Directory" override** (it must be empty so Vercel uses `.next`), then redeploy with build cache off.
+
 ## Notes
 - `.env.local` is gitignored — secrets never reach the repo. `.env.example` documents the shape.
 - Supabase Storage `media` bucket is public with a 50 MB cap (free-tier global limit).

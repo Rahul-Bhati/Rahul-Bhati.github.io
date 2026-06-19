@@ -24,7 +24,7 @@ git push -u origin portfolio-2026-with-auth
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | |
 | `SUPABASE_SERVICE_ROLE_KEY` | server-only |
 | `ADMIN_EMAIL` | |
-| `ADMIN_PASSWORD_HASH` | **escape `$` as `\$`** (same as `.env.local`) |
+| `ADMIN_PASSWORD_HASH` | On Vercel, paste the **raw** bcrypt hash (`$2b$12$…`), NOT the `\$`-escaped `.env.local` form. (The code now tolerates either, but raw is correct — escaping is only needed in `.env.local` due to dotenv-expand.) |
 | `AUTH_SECRET` | |
 | `PAGESPEED_API_KEY` | optional |
 

@@ -10,6 +10,25 @@ import { checkRateLimit, registerFailure, resetRateLimit } from "@/lib/rate-limi
 // Dummy hash so a wrong email still incurs a bcrypt comparison (no user enumeration via timing).
 const DUMMY_HASH = "$2b$12$0000000000000000000000000000000000000000000000000000a";
 
+/**
+ * Tolerate how ADMIN_PASSWORD_HASH may arrive across environments:
+ *  - `.env.local` (dotenv-expand) needs `$` escaped as `\$`; if that escaped form
+ *    is pasted verbatim into Vercel (no dotenv-expand), it arrives with literal
+ *    backslashes — strip them back to a valid bcrypt hash.
+ *  - Also strip accidental wrapping quotes.
+ */
+function normalizeHash(raw: string | undefined): string | undefined {
+  let h = raw?.trim();
+  if (!h) return undefined;
+  if (
+    (h.startsWith('"') && h.endsWith('"')) ||
+    (h.startsWith("'") && h.endsWith("'"))
+  ) {
+    h = h.slice(1, -1);
+  }
+  return h.replace(/\\\$/g, "$");
+}
+
 const credentialsSchema = z.object({
   email: z.string().trim().toLowerCase().email("Enter a valid email address."),
   password: z.string().min(1, "Password is required."),
@@ -64,7 +83,7 @@ export async function login(
   }
 
   const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-  const adminHash = process.env.ADMIN_PASSWORD_HASH;
+  const adminHash = normalizeHash(process.env.ADMIN_PASSWORD_HASH);
   if (!adminEmail || !adminHash) {
     return { error: "Server is not configured for login. Set ADMIN_EMAIL and ADMIN_PASSWORD_HASH." };
   }

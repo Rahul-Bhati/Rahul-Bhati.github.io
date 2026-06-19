@@ -1,4 +1,5 @@
 import "server-only";
+import { SITE_URL } from "@/lib/seo";
 
 export type PageSpeedScores = {
   performance: number | null;
@@ -18,7 +19,7 @@ const CATEGORIES = ["performance", "seo", "accessibility", "best-practices"] as 
  * Cached for 6h. Degrades gracefully when PAGESPEED_API_KEY is unset.
  */
 export async function getPageSpeed(
-  url = process.env.NEXT_PUBLIC_SITE_URL ?? "https://rahulbhati.dev",
+  url = SITE_URL,
 ): Promise<PageSpeedResult> {
   const key = process.env.PAGESPEED_API_KEY;
   if (!key) return { ok: false, reason: "no-key" };
